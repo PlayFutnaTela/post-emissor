@@ -148,8 +148,38 @@ Se quiser, posso:
 
 Diga qual(es) mudança(s) prefere que eu aplique agora e eu edito o código e testo localmente.
 
----
 
 **Autor do plugin (conforme cabeçalho):** Alexandre Chaves
 **Versão detectada:** 1.0.0
 **Licença:** GPL2
+
+## Fluxo de Trabalho do Plugin Post Emissor
+
+O fluxo de trabalho do plugin Post Emissor pode ser resumido nos seguintes passos:
+
+1. **Configuração Inicial**
+   - O administrador acessa as configurações do plugin e cadastra os sites receptores (URLs e tokens de autenticação, se necessário).
+   - Define o idioma de origem e, opcionalmente, configura a chave da API OpenAI para tradução automática.
+
+2. **Criação/Edição de Post**
+   - Ao criar ou editar um post, o usuário seleciona os sites receptores desejados na metabox específica do plugin.
+
+3. **Publicação do Post**
+   - Quando o post é publicado, o plugin dispara o envio dos dados para os sites receptores selecionados.
+   - O conteúdo, mídias, metadados, SEO e dados do autor são preparados e enviados via REST API.
+   - Se a tradução automática estiver habilitada, o conteúdo é traduzido antes do envio.
+
+4. **Atualização de Post**
+   - Se o post publicado for atualizado, o plugin repete o envio dos dados atualizados para os receptores.
+   - Mudanças de status (ex: de "publish" para "draft") também são propagadas para os receptores.
+
+5. **Deleção de Post**
+   - Ao deletar um post, o plugin envia um comando de deleção para os sites receptores, garantindo que o conteúdo seja removido remotamente.
+
+6. **Relatórios e Notificações**
+   - O plugin pode armazenar relatórios de envio em transients e exibir avisos no painel administrativo, informando o sucesso ou falha do envio para cada receptor.
+
+7. **Monitoramento e Logs**
+   - Todas as operações críticas (envio, atualização, deleção, tradução) são registradas via `error_log` para facilitar o monitoramento e depuração.
+
+Este fluxo garante que o conteúdo do WordPress seja replicado de forma eficiente, segura e automatizada entre múltiplos sites, mantendo a integridade dos dados e facilitando a gestão centralizada de publicações.
