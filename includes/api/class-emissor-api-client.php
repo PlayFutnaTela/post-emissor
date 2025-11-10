@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 2.0.0
  */
-class Dashi_Emissor_Api_Client {
+class Post_Emissor_Api_Client {
     
     private $timeout = 30;
     private $max_retries = 3;
@@ -20,7 +20,7 @@ class Dashi_Emissor_Api_Client {
     /**
      * Construtor da classe
      *
-     * @param Dashi_Emissor_Logger $logger Instância do logger
+     * @param Post_Emissor_Logger $logger Instância do logger
      */
     public function __construct($logger) {
         $this->logger = $logger;
@@ -63,7 +63,7 @@ class Dashi_Emissor_Api_Client {
         
         $headers = array(
             'Content-Type' => 'application/json',
-            'User-Agent' => 'Dashi-Emissor/' . DASHI_EMISSOR_VERSION
+            'User-Agent' => 'Post-Emissor/' . POST_EMISSOR_VERSION
         );
         
         if (!empty($receiver['auth_token'])) {
@@ -192,7 +192,7 @@ class Dashi_Emissor_Api_Client {
         
         $headers = array(
             'Content-Type' => 'application/json',
-            'User-Agent' => 'Dashi-Emissor/' . DASHI_EMISSOR_VERSION
+            'User-Agent' => 'Post-Emissor/' . POST_EMISSOR_VERSION
         );
         
         if (!empty($receiver['auth_token'])) {
@@ -275,7 +275,7 @@ class Dashi_Emissor_Api_Client {
         
         $headers = array(
             'Content-Type' => 'application/json',
-            'User-Agent' => 'Dashi-Emissor/' . DASHI_EMISSOR_VERSION
+            'User-Agent' => 'Post-Emissor/' . POST_EMISSOR_VERSION
         );
         
         if (!empty($receiver['auth_token'])) {
@@ -332,7 +332,7 @@ class Dashi_Emissor_Api_Client {
         $endpoint = trailingslashit($receiver['url']) . 'wp-json/post-receptor/v1/check-token';
         
         $headers = array(
-            'User-Agent' => 'Dashi-Emissor/' . DASHI_EMISSOR_VERSION
+            'User-Agent' => 'Post-Emissor/' . POST_EMISSOR_VERSION
         );
         
         if (!empty($receiver['auth_token'])) {

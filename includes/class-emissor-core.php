@@ -4,13 +4,13 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Classe principal do plugin Dashi Emissor
+ * Classe principal do plugin Post Emissor
  *
  * Implementa o padrão Singleton para garantir uma única instância do plugin
  *
  * @since 2.0.0
  */
-class Dashi_Emissor_Core {
+class Post_Emissor_Core {
     
     private static $instance = null;
     public $logger;
@@ -27,7 +27,7 @@ class Dashi_Emissor_Core {
     /**
      * Implementa o padrão Singleton
      *
-     * @return Dashi_Emissor_Core
+     * @return Post_Emissor_Core
      */
     public static function get_instance() {
         if (null === self::$instance) {
@@ -51,13 +51,13 @@ class Dashi_Emissor_Core {
      */
     private function init_constants() {
         // Chave de criptografia para tokens de segurança
-        if (!defined('DASHI_EMISSOR_ENCRYPTION_KEY')) {
-            $encryption_key = get_option('dashi_emissor_encryption_key');
+        if (!defined('POST_EMISSOR_ENCRYPTION_KEY')) {
+            $encryption_key = get_option('post_emissor_encryption_key');
             if (!$encryption_key) {
                 $encryption_key = wp_generate_password(32, true, true);
-                update_option('dashi_emissor_encryption_key', $encryption_key);
+                update_option('post_emissor_encryption_key', $encryption_key);
             }
-            define('DASHI_EMISSOR_ENCRYPTION_KEY', $encryption_key);
+            define('POST_EMISSOR_ENCRYPTION_KEY', $encryption_key);
         }
     }
     
@@ -85,35 +85,35 @@ class Dashi_Emissor_Core {
      * Inicializa o sistema de logs
      */
     private function init_logger() {
-        require_once DASHI_EMISSOR_DIR . 'includes/utilities/class-logger.php';
-        $this->logger = new Dashi_Emissor_Logger();
+        require_once POST_EMISSOR_DIR . 'includes/utilities/class-logger.php';
+        $this->logger = new Post_Emissor_Logger();
     }
     
     /**
      * Inicializa os manipuladores de eventos
      */
     private function init_handlers() {
-        require_once DASHI_EMISSOR_DIR . 'includes/handlers/class-post-handler.php';
-        $post_handler = new Dashi_Emissor_Post_Handler($this->logger);
+        require_once POST_EMISSOR_DIR . 'includes/handlers/class-post-handler.php';
+        $post_handler = new Post_Emissor_Post_Handler($this->logger);
         $post_handler->init();
         
         // Inicializar manipulador de tradução
-        require_once DASHI_EMISSOR_DIR . 'includes/handlers/class-translation-handler.php';
+        require_once POST_EMISSOR_DIR . 'includes/handlers/class-translation-handler.php';
     }
     
     /**
      * Inicializa o sistema de filas assíncronas
      */
     private function init_cron() {
-        require_once DASHI_EMISSOR_DIR . 'includes/class-emissor-cron.php';
-        $cron = new Dashi_Emissor_Cron($this->logger);
+        require_once POST_EMISSOR_DIR . 'includes/class-emissor-cron.php';
+        $cron = new Post_Emissor_Cron($this->logger);
     }
     
     /**
      * Inicializa metabox para seleção de receptores
      */
     private function init_metabox() {
-        require_once DASHI_EMISSOR_DIR . 'includes/class-emissor-metabox.php';
+        require_once POST_EMISSOR_DIR . 'includes/class-emissor-metabox.php';
     }
     
     /**
@@ -121,8 +121,8 @@ class Dashi_Emissor_Core {
      */
     private function init_admin() {
         if (is_admin()) {
-            require_once DASHI_EMISSOR_DIR . 'includes/class-emissor-admin.php';
-            $admin = new Dashi_Emissor_Admin();
+            require_once POST_EMISSOR_DIR . 'includes/class-emissor-admin.php';
+            $admin = new Post_Emissor_Admin();
             $admin->init();
         }
     }
@@ -131,7 +131,7 @@ class Dashi_Emissor_Core {
      * Carrega o domínio de tradução do plugin
      */
     public function load_textdomain() {
-        load_plugin_textdomain('dashi-emissor', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        load_plugin_textdomain('post-emissor', false, dirname(plugin_basename(__FILE__)) . '/languages');
     }
     
     /**
@@ -139,7 +139,7 @@ class Dashi_Emissor_Core {
      */
     public function init_checker() {
         if (is_admin()) {
-            require_once DASHI_EMISSOR_DIR . 'includes/utilities/checker.php';
+            require_once POST_EMISSOR_DIR . 'includes/utilities/checker.php';
         }
     }
     

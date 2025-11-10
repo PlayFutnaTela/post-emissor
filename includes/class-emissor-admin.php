@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 2.0.0
  */
-class Dashi_Emissor_Admin {
+class Post_Emissor_Admin {
     
     public $receivers;
     public $origin_language;
@@ -23,8 +23,8 @@ class Dashi_Emissor_Admin {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
-        add_action('wp_ajax_dashi_emissor_test_connection', array($this, 'ajax_test_connection'));
-        add_action('wp_ajax_dashi_emissor_save_token', array($this, 'ajax_save_token'));
+        add_action('wp_ajax_post_emissor_test_connection', array($this, 'ajax_test_connection'));
+        add_action('wp_ajax_post_emissor_save_token', array($this, 'ajax_save_token'));
     }
     
     /**
@@ -32,10 +32,10 @@ class Dashi_Emissor_Admin {
      */
     public function add_admin_menu() {
         add_menu_page(
-            __('Dashi Emissor', 'dashi-emissor'),
-            __('Dashi Emissor', 'dashi-emissor'),
+            __('Post Emissor', 'post-emissor'),
+            __('Post Emissor', 'post-emissor'),
             'manage_options',
-            'dashi-emissor',
+            'post-emissor',
             array($this, 'settings_page'),
             'dashicons-email-alt'
         );
@@ -45,10 +45,10 @@ class Dashi_Emissor_Admin {
      * Registra as configurações do plugin utilizando a Settings API do WordPress
      */
     public function register_settings() {
-        register_setting('dashi_emissor_settings_group', 'dashi_emissor_receivers', array(
+        register_setting('post_emissor_settings_group', 'post_emissor_receivers', array(
             'sanitize_callback' => array($this, 'sanitize_receivers')
         ));
-        register_setting('dashi_emissor_settings_group', 'dashi_emissor_origin_language');
+        register_setting('post_emissor_settings_group', 'post_emissor_origin_language');
     }
     
     /**
@@ -60,7 +60,7 @@ class Dashi_Emissor_Admin {
      * @return array O array de receptores processado
      */
     public function sanitize_receivers($input) {
-        $old = get_option('dashi_emissor_receivers', array());
+        $old = get_option('post_emissor_receivers', array());
         if (is_array($input)) {
             foreach ($input as $key => $receiver) {
                 if (empty($receiver['auth_token']) && isset($old[$key]['auth_token'])) {
@@ -93,7 +93,7 @@ class Dashi_Emissor_Admin {
         }
         
         $method = 'AES-256-CBC';
-        $key = hash('sha256', DASHI_EMISSOR_ENCRYPTION_KEY);
+        $key = hash('sha256', POST_EMISSOR_ENCRYPTION_KEY);
         $iv_length = openssl_cipher_iv_length($method);
         $iv = openssl_random_pseudo_bytes($iv_length);
         
@@ -114,7 +114,7 @@ class Dashi_Emissor_Admin {
         }
         
         $method = 'AES-256-CBC';
-        $key = hash('sha256', DASHI_EMISSOR_ENCRYPTION_KEY);
+        $key = hash('sha256', POST_EMISSOR_ENCRYPTION_KEY);
         $data = base64_decode($encrypted_token);
         
         $iv_length = openssl_cipher_iv_length($method);
@@ -128,15 +128,15 @@ class Dashi_Emissor_Admin {
      * Carrega scripts e estilos administrativos
      */
     public function enqueue_admin_scripts($hook) {
-        if ($hook !== 'toplevel_page_dashi-emissor') {
+        if ($hook !== 'toplevel_page_post-emissor') {
             return;
         }
         
-        wp_enqueue_style('dashi-emissor-admin', DASHI_EMISSOR_URL . 'assets/css/admin.css', array(), DASHI_EMISSOR_VERSION);
-        wp_enqueue_script('dashi-emissor-admin', DASHI_EMISSOR_URL . 'assets/js/modals.js', array('jquery'), DASHI_EMISSOR_VERSION, true);
+        wp_enqueue_style('post-emissor-admin', POST_EMISSOR_URL . 'assets/css/admin.css', array(), POST_EMISSOR_VERSION);
+        wp_enqueue_script('post-emissor-admin', POST_EMISSOR_URL . 'assets/js/modals.js', array('jquery'), POST_EMISSOR_VERSION, true);
         
-        wp_localize_script('dashi-emissor-admin', 'dashi_emissor', array(
-            'nonce' => wp_create_nonce('dashi_emissor_nonce'),
+        wp_localize_script('post-emissor-admin', 'post_emissor', array(
+            'nonce' => wp_create_nonce('post_emissor_nonce'),
             'ajax_url' => admin_url('admin-ajax.php'),
             'receiver_count' => count($this->get_receivers())
         ));
@@ -147,19 +147,19 @@ class Dashi_Emissor_Admin {
      */
     public function settings_page() {
         // Carrega o idioma de origem salvo
-        $this->origin_language = get_option('dashi_emissor_origin_language', get_locale());
+        $this->origin_language = get_option('post_emissor_origin_language', get_locale());
         // Recupera os sites receptores cadastrados e reindexa para índices sequenciais
-        $this->receivers = get_option('dashi_emissor_receivers', array());
+        $this->receivers = get_option('post_emissor_receivers', array());
         if (!is_array($this->receivers)) {
             $this->receivers = array();
         }
         $this->receivers = array_values($this->receivers);
         
         // Carregar templates
-        require DASHI_EMISSOR_DIR . 'templates/admin/settings.php';
-        require DASHI_EMISSOR_DIR . 'templates/admin/modals/connection-test-modal.php';
-        require DASHI_EMISSOR_DIR . 'templates/admin/modals/error-details-modal.php';
-        require DASHI_EMISSOR_DIR . 'templates/admin/modals/status-report-modal.php';
+        require POST_EMISSOR_DIR . 'templates/admin/settings.php';
+        require POST_EMISSOR_DIR . 'templates/admin/modals/connection-test-modal.php';
+        require POST_EMISSOR_DIR . 'templates/admin/modals/error-details-modal.php';
+        require POST_EMISSOR_DIR . 'templates/admin/modals/status-report-modal.php';
         
         // Adicionar script JavaScript com o número correto de receptores
         ?>

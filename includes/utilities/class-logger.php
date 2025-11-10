@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 2.0.0
  */
-class Dashi_Emissor_Logger {
+class Post_Emissor_Logger {
     
     /**
      * Registra uma mensagem de log
@@ -22,7 +22,7 @@ class Dashi_Emissor_Logger {
     public function log($level, $message, $context = array()) {
         global $wpdb;
         
-        $table_name = $wpdb->prefix . 'dashi_emissor_logs';
+        $table_name = $wpdb->prefix . 'post_emissor_logs';
         
         $data = array(
             'level' => sanitize_text_field($level),
@@ -36,7 +36,7 @@ class Dashi_Emissor_Logger {
         
         // Se falhar, registra via error_log como fallback
         if ($result === false) {
-            error_log("Dashi Emissor Log - Nível: {$level}, Mensagem: {$message}");
+            error_log("Post Emissor Log - Nível: {$level}, Mensagem: {$message}");
         }
     }
     

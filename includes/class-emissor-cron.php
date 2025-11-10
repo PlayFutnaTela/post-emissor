@@ -11,19 +11,19 @@ if (!defined('ABSPATH')) {
  *
  * @since 2.0.0
  */
-class Dashi_Emissor_Cron {
+class Post_Emissor_Cron {
     
     private $logger;
     
     /**
      * Construtor da classe
      *
-     * @param Dashi_Emissor_Logger $logger Instância do logger
+     * @param Post_Emissor_Logger $logger Instância do logger
      */
     public function __construct($logger) {
         $this->logger = $logger;
         add_action('init', array($this, 'schedule_events'));
-        add_action('dashi_emissor_process_queue', array($this, 'process_queue'));
+        add_action('post_emissor_process_queue', array($this, 'process_queue'));
         
         // Adicionar intervalo personalizado para WP-Cron
         add_filter('cron_schedules', array($this, 'add_custom_intervals'));
@@ -38,11 +38,11 @@ class Dashi_Emissor_Cron {
     public function add_custom_intervals($schedules) {
         $schedules['every_minute'] = array(
             'interval' => 60,
-            'display' => __('A cada minuto', 'dashi-emissor')
+            'display' => __('A cada minuto', 'post-emissor')
         );
         $schedules['every_5_minutes'] = array(
             'interval' => 300,
-            'display' => __('A cada 5 minutos', 'dashi-emissor')
+            'display' => __('A cada 5 minutos', 'post-emissor')
         );
         return $schedules;
     }

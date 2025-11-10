@@ -100,14 +100,14 @@ function init_post_emissor() {
 add_action('plugins_loaded', 'init_post_emissor');
 
 // Adiciona admin notice para mostrar relatórios
-function dashi_emissor_show_admin_notices() {
+function post_emissor_show_admin_notices() {
     global $pagenow;
     if ($pagenow === 'post.php' && isset($_GET['post'])) {
         $post_id = (int) $_GET['post'];
-        $results = get_transient('dashi_emissor_report_' . $post_id);
+        $results = get_transient('post_emissor_report_' . $post_id);
         if ($results !== false) {
             // Apaga o transient para não repetir o aviso
-            delete_transient('dashi_emissor_report_' . $post_id);
+            delete_transient('post_emissor_report_' . $post_id);
             
             // Monta a mensagem
             $messages = array();
@@ -128,7 +128,7 @@ function dashi_emissor_show_admin_notices() {
             }
             ?>
             <div class="notice notice-info">
-                <p><strong><?php _e('Relatório de Envio aos Receptores:', 'dashi-emissor'); ?></strong></p>
+                <p><strong><?php _e('Relatório de Envio aos Receptores:', 'post-emissor'); ?></strong></p>
                 <ul>
                     <?php echo implode('', $messages); ?>
                 </ul>
@@ -137,4 +137,4 @@ function dashi_emissor_show_admin_notices() {
         }
     }
 }
-add_action('admin_notices', 'dashi_emissor_show_admin_notices');
+add_action('admin_notices', 'post_emissor_show_admin_notices');

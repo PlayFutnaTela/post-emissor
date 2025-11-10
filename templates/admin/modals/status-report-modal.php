@@ -1,16 +1,16 @@
 <!-- templates/admin/modals/status-report-modal.php -->
-<div id="dashi-emissor-status-report-modal" style="display:none;">
-    <div class="dashi-modal-overlay"></div>
-    <div class="dashi-modal dashi-modal-large">
-        <div class="dashi-modal-header">
+<div id="post-emissor-status-report-modal" style="display:none;">
+    <div class="post-modal-overlay"></div>
+    <div class="post-modal post-modal-large">
+        <div class="post-modal-header">
             <h3>Relatório de Status</h3>
-            <button class="dashi-modal-close">&times;</button>
+            <button class="post-modal-close">&times;</button>
         </div>
-        <div class="dashi-modal-body">
-            <div id="dashi-status-report-content"></div>
+        <div class="post-modal-body">
+            <div id="post-status-report-content"></div>
         </div>
-        <div class="dashi-modal-footer">
-            <button class="dashi-modal-close button">Fechar</button>
+        <div class="post-modal-footer">
+            <button class="post-modal-close button">Fechar</button>
         </div>
     </div>
 </div>

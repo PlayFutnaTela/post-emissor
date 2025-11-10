@@ -11,14 +11,14 @@ if (!defined('ABSPATH')) {
  *
  * @since 2.0.0
  */
-class Dashi_Emissor_Post_Handler {
+class Post_Emissor_Post_Handler {
     
     private $logger;
     
     /**
      * Construtor da classe
      *
-     * @param Dashi_Emissor_Logger $logger Instância do logger
+     * @param Post_Emissor_Logger $logger Instância do logger
      */
     public function __construct($logger) {
         $this->logger = $logger;
@@ -69,10 +69,9 @@ class Dashi_Emissor_Post_Handler {
             return;
         }
         
-        // Ignora autosave, revisões, ou se for novo e ainda não publicado
+        // Ignora autosave, revisões
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
         if (wp_is_post_revision($post_ID)) return;
-        if (!$update) return;
 
         // Se já está publicado, envia para os receptores
         if ('publish' === $post->post_status) {
@@ -104,18 +103,18 @@ class Dashi_Emissor_Post_Handler {
      * @param WP_Post $post Objeto do post
      */
     public function send_post_data($post) {
-        require_once DASHI_EMISSOR_DIR . 'includes/models/class-post-data.php';
-        require_once DASHI_EMISSOR_DIR . 'includes/class-emissor-cron.php';
-        require_once DASHI_EMISSOR_DIR . 'includes/handlers/class-translation-handler.php';
+        require_once POST_EMISSOR_DIR . 'includes/models/class-post-data.php';
+        require_once POST_EMISSOR_DIR . 'includes/class-emissor-cron.php';
+        require_once POST_EMISSOR_DIR . 'includes/handlers/class-translation-handler.php';
         
-        $post_data = Dashi_Emissor_Post_Data::get_formatted_data($post);
+        $post_data = Post_Emissor_Post_Data::get_formatted_data($post);
         
         // Verificar se a tradução está ativada e aplicar se necessário
         $target_language = $this->get_target_language_for_receivers($post->ID);
         if ($target_language && $this->is_translation_enabled()) {
-            $translation_handler = new Dashi_Emissor_Translation_Handler($this->logger);
+            $translation_handler = new Post_Emissor_Translation_Handler($this->logger);
             
-            $source_language = get_option('dashi_emissor_origin_language', get_locale());
+            $source_language = get_option('post_emissor_origin_language', get_locale());
             
             // Traduzir campos específicos
             $post_data['title'] = $translation_handler->translate_text_context($post_data['title'], $source_language, $target_language, 'title');
@@ -124,7 +123,7 @@ class Dashi_Emissor_Post_Handler {
         }
         
         $all_receivers = $this->get_all_receivers();
-        $selected = get_post_meta($post->ID, '_dashi_emissor_selected_receivers', true);
+        $selected = get_post_meta($post->ID, '_post_emissor_selected_receivers', true);
         if (!is_array($selected)) {
             $selected = array();
         }
@@ -142,7 +141,7 @@ class Dashi_Emissor_Post_Handler {
         }
         
         // Adicionar à fila para processamento assíncrono
-        $cron = new Dashi_Emissor_Cron($this->logger);
+        $cron = new Post_Emissor_Cron($this->logger);
         $cron->add_to_queue($post_data, $receivers_to_send, $post->ID, 'send');
         
         $this->logger->info(sprintf(
@@ -160,7 +159,7 @@ class Dashi_Emissor_Post_Handler {
      * @return bool True se a tradução estiver ativada, false caso contrário
      */
     private function is_translation_enabled() {
-        $openai_api_key = get_option('dashi_emissor_openai_api_key', '');
+        $openai_api_key = get_option('post_emissor_openai_api_key', '');
         return !empty($openai_api_key);
     }
     
@@ -183,14 +182,14 @@ class Dashi_Emissor_Post_Handler {
      * @param string $new_status Novo status do post
      */
     public function update_post_status($post, $new_status) {
-        require_once DASHI_EMISSOR_DIR . 'includes/class-emissor-cron.php';
+        require_once POST_EMISSOR_DIR . 'includes/class-emissor-cron.php';
         
         $update_data = array(
             'ID' => $post->ID,
             'status' => $new_status
         );
         
-        $selected_receivers = get_post_meta($post->ID, '_dashi_emissor_selected_receivers', true);
+        $selected_receivers = get_post_meta($post->ID, '_post_emissor_selected_receivers', true);
         if (!is_array($selected_receivers)) {
             $selected_receivers = array();
         }
@@ -215,7 +214,7 @@ class Dashi_Emissor_Post_Handler {
         }
         
         // Adicionar à fila para processamento assíncrono
-        $cron = new Dashi_Emissor_Cron($this->logger);
+        $cron = new Post_Emissor_Cron($this->logger);
         $cron->add_to_queue($update_data, $receivers_to_update, $post->ID, 'update_status');
         
         $this->logger->info(sprintf(
@@ -235,9 +234,9 @@ class Dashi_Emissor_Post_Handler {
      * @param array $delete_data Dados da deleção
      */
     private function queue_post_deletion($delete_data) {
-        require_once DASHI_EMISSOR_DIR . 'includes/class-emissor-cron.php';
+        require_once POST_EMISSOR_DIR . 'includes/class-emissor-cron.php';
         
-        $selected_receivers = get_post_meta($delete_data['ID'], '_dashi_emissor_selected_receivers', true);
+        $selected_receivers = get_post_meta($delete_data['ID'], '_post_emissor_selected_receivers', true);
         if (!is_array($selected_receivers)) {
             $selected_receivers = array();
         }
@@ -262,7 +261,7 @@ class Dashi_Emissor_Post_Handler {
         }
         
         // Adicionar à fila para processamento assíncrono
-        $cron = new Dashi_Emissor_Cron($this->logger);
+        $cron = new Post_Emissor_Cron($this->logger);
         $cron->add_to_queue($delete_data, $receivers_to_delete, $delete_data['ID'], 'delete');
         
         $this->logger->info(sprintf(
@@ -281,11 +280,11 @@ class Dashi_Emissor_Post_Handler {
      */
     private function get_all_receivers() {
         // Tenta obter do cache primeiro
-        $cache_key = 'dashi_emissor_receivers';
+        $cache_key = 'post_emissor_receivers';
         $receivers = get_transient($cache_key);
         
         if ($receivers === false) {
-            $receivers = get_option('dashi_emissor_receivers', array());
+            $receivers = get_option('post_emissor_receivers', array());
             set_transient($cache_key, $receivers, 15 * MINUTE_IN_SECONDS);
         }
         
@@ -311,7 +310,7 @@ class Dashi_Emissor_Post_Handler {
         }
         
         $method = 'AES-256-CBC';
-        $key = hash('sha256', DASHI_EMISSOR_ENCRYPTION_KEY);
+        $key = hash('sha256', POST_EMISSOR_ENCRYPTION_KEY);
         $data = base64_decode($encrypted_token);
         
         $iv_length = openssl_cipher_iv_length($method);
